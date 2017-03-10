@@ -37,10 +37,10 @@ class CouchbaseConnector implements Connectable
     {
         $configure = array_merge($this->configure, $servers);
 
-        return new CouchbaseCluster(
-            $configure['host'],
-            $configure['user'],
-            $configure['password']
-        );
+        $cluster = new \CouchbaseCluster($configure['host']);
+        $authenticator = new \Couchbase\ClassicAuthenticator();
+        $authenticator->bucket($configure['user'], $configure['password']);
+        $cluster->authenticate($authenticator);
+        return $cluster;
     }
 }
