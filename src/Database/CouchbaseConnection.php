@@ -38,23 +38,11 @@ class CouchbaseConnection extends Connection
     /** @var \CouchbaseCluster */
     protected $connection;
 
-    /** @var */
-    protected $managerUser;
-
-    /** @var */
-    protected $managerPassword;
-
     /** @var array */
     protected $options = [];
 
     /** @var int */
     protected $fetchMode = 0;
-
-    /** @var array */
-    protected $enableN1qlServers = [];
-
-    /** @var string */
-    protected $bucketPassword = '';
 
     /** @var string[] */
     protected $metrics;
@@ -97,18 +85,6 @@ class CouchbaseConnection extends Connection
     }
 
     /**
-     * @param $password
-     *
-     * @return $this
-     */
-    public function setBucketPassword($password)
-    {
-        $this->bucketPassword = $password;
-
-        return $this;
-    }
-
-    /**
      * @param string $name
      *
      * @return \CouchbaseBucket
@@ -117,7 +93,7 @@ class CouchbaseConnection extends Connection
      */
     public function openBucket($name)
     {
-        return $this->getCouchbase()->openBucket($name, $this->bucketPassword);
+        return $this->getCouchbase()->openBucket($name);
     }
 
     /**
@@ -125,7 +101,7 @@ class CouchbaseConnection extends Connection
      */
     public function manager()
     {
-        return $this->getCouchbase()->manager($this->managerUser, $this->managerPassword);
+        return $this->getCouchbase()->manager();
     }
 
     /**
@@ -181,20 +157,11 @@ class CouchbaseConnection extends Connection
 
     /**
      *
-     * @param array $config enable(array), options(array), administrator(array), bucket_password(string)
+     * @param array $config options(array)
      */
     protected function getManagedConfigure(array $config)
     {
-        $this->enableN1qlServers = (isset($config['enables'])) ? $config['enables'] : [];
         $this->options = (isset($config['options'])) ? $config['options'] : [];
-        $manager = (isset($config['administrator'])) ? $config['administrator'] : null;
-        $this->managerUser = '';
-        $this->managerPassword = '';
-        if (!is_null($manager)) {
-            $this->managerUser = $config['administrator']['user'];
-            $this->managerPassword = $config['administrator']['password'];
-        }
-        $this->bucketPassword = (isset($config['bucket_password'])) ? $config['bucket_password'] : '';
     }
 
     /**
@@ -422,21 +389,6 @@ class CouchbaseConnection extends Connection
     public function disconnect()
     {
         $this->connection = null;
-    }
-
-    /**
-     * @param CouchbaseBucket $bucket
-     *
-     * @return CouchbaseBucket
-     */
-    protected function enableN1ql(CouchbaseBucket $bucket)
-    {
-        if (!count($this->enableN1qlServers)) {
-            return $bucket;
-        }
-        $bucket->enableN1ql($this->enableN1qlServers);
-
-        return $bucket;
     }
 
     /**

@@ -41,13 +41,8 @@ add database driver(config/database.php)
 'couchbase' => [
     'driver' => 'couchbase',
     'host' => 'couchbase://127.0.0.1',
-    'user' => 'userName', // optional administrator
-    'password' => 'password', // optional administrator
-    // optional configuration / management operations against a bucket.
-    'administrator' => [
-        'user'     => 'Administrator',
-        'password' => 'password',
-    ],
+    'user' => 'userName',
+    'password' => 'password',
 ],
 ```
 
@@ -58,8 +53,8 @@ case cluster
 'couchbase' => [
     'driver' => 'couchbase',
     'host' => 'couchbase://127.0.0.1,192.168.1.2',
-    'user' => 'userName', // optional administrator
-    'password' => 'password', // optional administrator
+    'user' => 'userName', 
+    'password' => 'password',
 ],
 ```
 
@@ -287,9 +282,10 @@ To run tests there are should be following buckets created on local Couchbase cl
 
 ``` php
 $cluster = new CouchbaseCluster('couchbase://127.0.0.1');
-$clusterManager = $cluster->manager('Administrator', 'password');
-$clusterManager->createBucket('testing', ['bucketType' => 'couchbase', 'saslPassword' => '', 'flushEnabled' => true]);
-$clusterManager->createBucket('memcache-couch', ['bucketType' => 'memcached', 'saslPassword' => '', 'flushEnabled' => true]);
+$cluster->authenticateAs('Administrator', 'password');
+$clusterManager = $cluster->manager();
+$clusterManager->createBucket('testing', ['bucketType' => 'couchbase', 'flushEnabled' => true]);
+$clusterManager->createBucket('memcache-couch', ['bucketType' => 'memcached', 'flushEnabled' => true]);
 sleep(5);
 $bucketManager = $cluster->openBucket('testing')->manager();
 $bucketManager->createN1qlPrimaryIndex();

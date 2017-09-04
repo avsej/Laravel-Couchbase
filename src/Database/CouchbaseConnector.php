@@ -23,7 +23,7 @@ class CouchbaseConnector implements Connectable
 {
     /** @var string[] */
     protected $configure = [
-        'host'     => '127.0.0.1',
+        'host'     => 'couchbase://127.0.0.1',
         'user'     => '',
         'password' => '',
     ];
@@ -38,9 +38,7 @@ class CouchbaseConnector implements Connectable
         $configure = array_merge($this->configure, $servers);
 
         $cluster = new \CouchbaseCluster($configure['host']);
-        $authenticator = new \Couchbase\ClassicAuthenticator();
-        $authenticator->bucket($configure['user'], $configure['password']);
-        $cluster->authenticate($authenticator);
+        $cluster->authenticateAs($configure['user'], $configure['password']);
         return $cluster;
     }
 }
